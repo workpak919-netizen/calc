@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = HH Bill Book
+title = Calculater
 
 # (str) Package name
-package.name = hhbillbook
+package.name = Calculater
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.hh
+package.domain = org.calc
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -108,7 +108,7 @@ android.presplash_color = #610202ff
 #android.sdk = 20
 
 # (str) Android NDK version to use
-#android.ndk = 23b
+#android.ndk = 25b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
@@ -428,3 +428,4 @@ warn_on_root = 1
 #    Then, invoke the command line with the "demo" profile:
 #
 #buildozer --profile demo android debug
+
