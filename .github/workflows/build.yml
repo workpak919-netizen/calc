@@ -2,87 +2,51 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # Step 1: Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Setup Python
+      # Step 2: Setup Python
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      # Install dependencies
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y \
-            python3-pip \
-            python3-setuptools \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            python3-dev \
-            libffi-dev \
-            libssl-dev \
-            autoconf \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
-            cmake
+          python -m pip install --upgrade pip
+          pip install buildozer cython
 
-          pip install --upgrade pip
-          pip install Cython==0.29.36
-          pip install buildozer
-
-      # Install Android SDK & NDK
-      - name: Install Android SDK and NDK
+      # Step 4: Install system dependencies
+      - name: Install system dependencies
         run: |
-          sudo apt-get install -y wget tar
-          mkdir -p $HOME/android
-          cd $HOME/android
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            python3-pip python3-setuptools \
+            python3-wheel python3-virtualenv \
+            libffi-dev libssl-dev \
+            adb wget curl
 
-          # Download command line tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d cmdline-tools
-          mkdir -p $HOME/android/cmdline-tools/latest
-          mv cmdline-tools/cmdline-tools/* $HOME/android/cmdline-tools/latest/
-
-          export ANDROID_HOME=$HOME/android
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-31" "build-tools;33.0.2" "ndk;23.1.7779620"
-
-      # Build APK
-      - name: Build APK with Buildozer
+      # Step 5: Build APK
+      - name: Build APK
         run: |
-          export ANDROID_HOME=$HOME/android
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-          buildozer init
-          sed -i 's/# package.domain = mydomain/package.domain = org.test/' buildozer.spec
-          sed -i 's/# package.name = myapp/package.name = CalculatorApp/' buildozer.spec
-          sed -i 's/# package.version = 0.1/package.version = 1.0/' buildozer.spec
-          sed -i 's/# requirements = python3/requirements = python3,kivy/' buildozer.spec
           buildozer android debug
 
-      # Upload APK
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+      # Step 6: Upload APK (fixed with v4)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: CalculatorApp
+          name: my-app-apk
           path: bin/*.apk
+
